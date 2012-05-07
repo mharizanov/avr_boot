@@ -37,6 +37,7 @@
 /-------------------------------------------------------------------------*/
 
 
+#include <util/delay.h>
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <string.h>
@@ -66,6 +67,10 @@ pagecmp(uint16_t addr, uint8_t *data)
 
 int main (void)
 {
+
+    DDRB = DDRB | 2;	// sets digital pin 9 = OUTPUT
+	PORTB = PORTB & 0xFD; // sets digital pin 9 = LOW
+	
 	DWORD fa;	/* Flash address */
 	WORD br;	/* Bytes read */
 
@@ -80,16 +85,15 @@ int main (void)
 			
 			for (j = br; j < SPM_PAGESIZE; j++) /* Pad the remaining last page with 0xFF so that comparison goes OK */
 			Buff[j] = 0xFF;
-			
+			PORTB = PORTB & 0xFD; // sets digital pin 9 = LOW			
 			if (pagecmp(fa, Buff)) {			/* Only flash if page is changed */
-//			#define LED   9			
-//			pin_high(LED);
+
 				if (br) { 
 					flash_erase(fa);					/* Erase a page */
-					flash_write(fa, Buff);		/* Write it if the data is available */
+				    flash_write(fa, Buff);		/* Write it if the data is available */
 				}
-//			pin_low(LED);
-		    }
+				PORTB = PORTB | 2; // sets digital pin 9 = HIGH
+			}
 		}
 	}
 
