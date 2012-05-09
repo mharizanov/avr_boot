@@ -32,11 +32,6 @@ void dly_100us (void);		/* Delay 100 microseconds (asmfunc.S) */
 
 ---------------------------------------------------------------------------*/
 
-#define SPI_PORT PORTB
-#define SPI_DDR  DDRB
-#define SPI_SS   PB2 
-
-
 /* Definitions for MMC/SDC command */
 #define CMD0	(0x40+0)	/* GO_IDLE_STATE */
 #define CMD1	(0x40+1)	/* SEND_OP_COND (MMC) */
@@ -119,11 +114,6 @@ DSTATUS disk_initialize (void)
 {
 	BYTE n, cmd, ty, ocr[4];
 	UINT tmr;
-
-	
-    SPI_PORT |= 1<<SPI_SS;   //PB2 output: High (deselect other SPI chips)
-    SPI_DDR  |= 1<<SPI_SS; // SPI Data -> Output
-
 
 	init_spi();							/* Initialize ports to control MMC */
 	for (n = 100; n; n--) dly_100us();	/* 10ms delay */
