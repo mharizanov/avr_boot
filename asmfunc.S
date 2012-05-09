@@ -3,8 +3,17 @@
 ;---------------------------------------------------------------------------;
 ; Hardware dependent macros to be modified
 
+//sparkfun microsd
+//#define	DDR_CS	_SFR_IO_ADDR(DDRB), 0	// MMC CS pin (DDR, PORT)
+//#define	PORT_CS	_SFR_IO_ADDR(PORTB), 0
+// i2GPS
+//#define	DDR_CS	_SFR_IO_ADDR(DDRB), 2	// MMC CS pin (DDR, PORT)
+//#define	PORT_CS	_SFR_IO_ADDR(PORTB), 2
+
+// Arduino Ethernet
 #define	DDR_CS	_SFR_IO_ADDR(DDRD), 4	// MMC CS pin (DDR, PORT)
 #define	PORT_CS	_SFR_IO_ADDR(PORTD), 4
+
 
 #define	DDR_CK	_SFR_IO_ADDR(DDRB), 5	// MMC SCLK pin (DDR, PORT)
 #define	PORT_CK	_SFR_IO_ADDR(PORTB), 5
@@ -15,7 +24,12 @@
 #define	PIN_DO	_SFR_IO_ADDR(PINB), 4	// MMC DO pin (PIN, PORT)
 #define	PORT_DO	_SFR_IO_ADDR(PORTB), 4
 
+#define	DDR_SS	_SFR_IO_ADDR(DDRB), 2	// SS pin (PIN, PORT)
+#define PORT_SS _SFR_IO_ADDR(PORTB),2
 
+
+
+	
 ;---------------------------------------------------------------------------;
 .nolist
 #include <avr/io.h>
@@ -34,6 +48,8 @@ init_spi:
 	sbi	DDR_CS		; CS: output
 	sbi	DDR_DI		; DI: output
 	sbi	DDR_CK		; SCLK: output
+	sbi	DDR_SS          ; Set SS to output, Atmega is SPI master
+	sbi	PORT_SS		; set it to high
 	sbi	PORT_DO		; DO: pull-up
 	ret
 .endfunc
