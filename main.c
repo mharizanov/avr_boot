@@ -36,17 +36,26 @@
 /
 /-------------------------------------------------------------------------*/
 
+/* Onboard LED is connected to pin PB5 in Arduino NG, Diecimila, and Duomilanuove */ 
+/* other boards like e.g. Crumb8, Crumb168 are using PB2 */
+/* Arduino Ethernet is PB1 */
 
+#define LED_DDR  DDRB
+#define LED_PORT PORTB
+#define LED_PIN  PINB
+#define LED      PINB1
 
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <string.h>
 #include "pff.h"
 #include <avr/eeprom.h>
-
+#include <util/delay.h>
 
 void flash_erase (DWORD);				/* Erase a flash page (asmfunc.S) */
 void flash_write (DWORD, const BYTE*);	/* Program a flash page (asmfunc.S) */
+
+void flash_led(uint8_t);
 
 FATFS Fatfs;				/* Petit-FatFs work area */
 BYTE Buff[SPM_PAGESIZE];	/* Page data buffer */
@@ -74,6 +83,9 @@ int main (void)
 	uint8_t i = 0;
 	uint8_t ch = 0;
 
+	/* set LED pin as output */
+	LED_DDR |= _BV(LED);
+	
 	pf_mount(&Fatfs);	/* Initialize file system */
 	
 
@@ -113,8 +125,10 @@ int main (void)
 				for (i = br; i < SPM_PAGESIZE; i++)     /* Pad the remaining last page with 0xFF so that comparison goes OK */
 					Buff[i] = 0xFF;
 				if (pagecmp(fa, Buff)) {		/* Only flash if page is changed */
+					LED_PORT |= _BV(LED);
 					flash_erase(fa);		/* Erase a page */
 					flash_write(fa, Buff);		/* Write it if the data is available */				
+					LED_PORT &= ~_BV(LED);
 				}
 			}
 		}
@@ -126,3 +140,13 @@ int main (void)
 	for (;;) ;	/* No application, Halt. */
 }
 
+
+void flash_led(uint8_t count)
+{
+	while (count--) {
+		LED_PORT |= _BV(LED);
+		_delay_ms(100);
+		LED_PORT &= ~_BV(LED);
+		_delay_ms(80);
+	}
+}
