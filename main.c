@@ -42,6 +42,7 @@
 #include <avr/pgmspace.h>
 #include <string.h>
 #include "pff.h"
+#include <avr/eeprom.h>
 
 
 void flash_erase (DWORD);				/* Erase a flash page (asmfunc.S) */
